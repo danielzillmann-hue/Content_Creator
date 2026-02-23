@@ -1,46 +1,53 @@
 {% extends "base.html" %}
-{% block title %}Pending Drafts — AI Content Engine{% endblock %}
-{% block content %}
-<h1>Pending Drafts</h1>
+{% block title %}Drafts — AI Content Engine{% endblock %}
+{% block page_title %}Drafts{% endblock %}
+{% block page_actions %}
+<a href="/create" class="btn btn-primary btn-sm">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    New Post
+</a>
+{% endblock %}
 
+{% block content %}
 {% if pipelines %}
 <div class="pipeline-list">
     {% for p in pipelines %}
-    <div class="pipeline-card">
+    <a href="/review/{{ p.id }}" class="pipeline-card">
         <div class="pipeline-header">
-            <span class="pipeline-date">{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
-            <span class="badge badge-{{ p.status }}">{{ p.status }}</span>
+            <span class="pipeline-date">{{ p.created_at.strftime('%b %d, %Y at %H:%M') }}</span>
+            <div style="display:flex;gap:0.4rem;align-items:center;">
+                {% if p.scout_output and p.scout_output.source_type == 'manual' %}
+                <span class="badge badge-manual">manual</span>
+                {% endif %}
+                <span class="badge badge-{{ p.status }}">{{ p.status }}</span>
+            </div>
         </div>
 
         {% if p.editor_output %}
         <div class="draft-preview">
-            <h3>LinkedIn Post</h3>
-            <p class="preview-text">{{ p.editor_output.linkedin_draft.content[:200] }}...</p>
-        </div>
-        <div class="draft-preview">
-            <h3>Medium Article</h3>
-            <p class="preview-text">{{ p.editor_output.medium_draft.title }}</p>
+            <h3>{{ p.editor_output.medium_draft.title }}</h3>
+            <p class="preview-text">{{ p.editor_output.linkedin_draft.content[:180] }}...</p>
         </div>
         {% endif %}
 
-        {% if p.scout_output %}
+        {% if p.scout_output and p.scout_output.topics %}
         <div class="topics">
             {% for topic in p.scout_output.topics %}
             <span class="tag">{{ topic }}</span>
             {% endfor %}
         </div>
         {% endif %}
-
-        <div class="pipeline-actions">
-            <a href="/review/{{ p.id }}" class="btn btn-primary">Review</a>
-        </div>
-    </div>
+    </a>
     {% endfor %}
 </div>
 {% else %}
 <div class="empty-state">
-    <p>No pending drafts. The pipeline runs daily at 7am AEST.</p>
-    <p>You can also trigger it manually via the Cloud Function.</p>
+    <div class="empty-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <h3>No drafts yet</h3>
+    <p>Create your first post manually, or wait for the daily automated pipeline to generate one.</p>
+    <a href="/create" class="btn btn-primary">Create New Post</a>
 </div>
 {% endif %}
 {% endblock %}

@@ -1,19 +1,30 @@
 {% extends "base.html" %}
 {% block title %}Review Draft — AI Content Engine{% endblock %}
-{% block content %}
-<h1>Review Draft</h1>
-<p class="meta">Created: {{ pipeline.created_at.strftime('%Y-%m-%d %H:%M UTC') }} | Status: <span class="badge badge-{{ pipeline.status }}">{{ pipeline.status }}</span></p>
+{% block page_title %}Review Draft{% endblock %}
+{% block page_actions %}
+<div class="meta">
+    {{ pipeline.created_at.strftime('%b %d, %Y at %H:%M UTC') }}
+    <span class="badge badge-{{ pipeline.status }}">{{ pipeline.status }}</span>
+    {% if pipeline.scout_output and pipeline.scout_output.source_type == 'manual' %}
+    <span class="badge badge-manual">manual</span>
+    {% endif %}
+</div>
+{% endblock %}
 
+{% block content %}
 {% if pipeline.scout_output %}
 <section class="section">
-    <h2>Scout Findings</h2>
+    <h2>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Source Material
+    </h2>
     <div class="scout-items">
         {% for item in pipeline.scout_output.items %}
         <div class="scout-item">
             <strong>{{ item.headline }}</strong>
             <p>{{ item.summary }}</p>
             {% if item.source_url %}
-            <a href="{{ item.source_url }}" target="_blank" rel="noopener">Source</a>
+            <a href="{{ item.source_url }}" target="_blank" rel="noopener">View source &rarr;</a>
             {% endif %}
         </div>
         {% endfor %}
@@ -24,26 +35,37 @@
 {% if pipeline.editor_output %}
 <form method="post" action="/approve/{{ pipeline.id }}">
     <section class="section">
-        <h2>LinkedIn Post</h2>
+        <h2>
+            <div class="section-icon section-icon-linkedin">in</div>
+            LinkedIn Post
+        </h2>
         <textarea name="linkedin_content" rows="12" class="editor-textarea">{{ pipeline.editor_output.linkedin_draft.content }}</textarea>
     </section>
 
     <section class="section">
-        <h2>Medium Article (Markdown)</h2>
+        <h2>
+            <div class="section-icon section-icon-medium">M</div>
+            Medium Article
+        </h2>
         <textarea name="medium_content" rows="25" class="editor-textarea">{{ pipeline.editor_output.medium_draft.content_markdown }}</textarea>
-        <p class="hint">Title: {{ pipeline.editor_output.medium_draft.title }} | Tags: {{ pipeline.editor_output.medium_draft.tags | join(', ') }}</p>
+        <p class="hint">Title: {{ pipeline.editor_output.medium_draft.title }} &middot; Tags: {{ pipeline.editor_output.medium_draft.tags | join(', ') }}</p>
     </section>
 
     <div class="action-bar">
-        <button type="submit" class="btn btn-success">Approve (Save Edits)</button>
-        <button type="submit" formaction="/publish/{{ pipeline.id }}" name="platform" value="linkedin" class="btn btn-linkedin">Publish LinkedIn</button>
-        <button type="submit" formaction="/publish/{{ pipeline.id }}" name="platform" value="medium" class="btn btn-medium">Publish Medium</button>
-        <button type="submit" formaction="/publish/{{ pipeline.id }}" name="platform" value="all" class="btn btn-primary">Publish Both</button>
-        <button type="submit" formaction="/reject/{{ pipeline.id }}" class="btn btn-danger">Reject</button>
-        <a href="/" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-success">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Save Edits
+        </button>
+        <div class="action-spacer"></div>
+        <button type="submit" formaction="/publish/{{ pipeline.id }}" name="platform" value="linkedin" class="btn btn-linkedin btn-sm">Publish LinkedIn</button>
+        <button type="submit" formaction="/publish/{{ pipeline.id }}" name="platform" value="medium" class="btn btn-medium btn-sm">Publish Medium</button>
+        <button type="submit" formaction="/publish/{{ pipeline.id }}" name="platform" value="all" class="btn btn-primary btn-sm">Publish Both</button>
+        <button type="submit" formaction="/reject/{{ pipeline.id }}" class="btn btn-ghost btn-sm" style="color:var(--danger);">Reject</button>
     </div>
 </form>
 {% else %}
-<p class="empty-state">No editor output available for this pipeline.</p>
+<div class="empty-state">
+    <p>No editor output available for this pipeline.</p>
+</div>
 {% endif %}
 {% endblock %}

@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% block title %}New Post — AI Content Engine{% endblock %}
+{% block page_title %}Create New Post{% endblock %}
+
 {% block content %}
-<h1>Create New Post</h1>
-<p class="meta">Provide a URL or text description and we'll generate LinkedIn + Medium drafts for you.</p>
+<p class="hint" style="margin-bottom:1.5rem;font-size:0.88rem;">Provide a URL or text description and we'll generate LinkedIn + Medium drafts for you.</p>
 
 {% if error %}
-<div class="alert alert-error">{{ error }}</div>
+<div class="alert alert-error">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    {{ error }}
+</div>
 {% endif %}
 
 <form method="post" action="/create" class="create-form">
@@ -40,29 +44,26 @@
     </div>
 
     <div class="form-actions">
-        <button type="submit" class="btn btn-primary" id="submit-btn">Generate Drafts</button>
-        <a href="/" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Generate Drafts
+        </button>
+        <a href="/" class="btn btn-secondary btn-lg">Cancel</a>
     </div>
 </form>
 
 <script>
 function switchTab(tab) {
-    // Update hidden field
     document.getElementById('input_type').value = tab;
-
-    // Toggle tab buttons
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(function(btn) { btn.classList.remove('active'); });
     event.target.classList.add('active');
-
-    // Toggle tab content
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
     document.getElementById('tab-' + tab).classList.add('active');
 }
 
-// Show loading state on submit
 document.querySelector('.create-form').addEventListener('submit', function() {
     var btn = document.getElementById('submit-btn');
-    btn.textContent = 'Generating...';
+    btn.innerHTML = '<div class="spinner"></div> Generating...';
     btn.disabled = true;
 });
 </script>
