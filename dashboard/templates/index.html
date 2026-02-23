@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Pending Drafts — AI Content Engine{% endblock %}
+{% block content %}
+<h1>Pending Drafts</h1>
+
+{% if pipelines %}
+<div class="pipeline-list">
+    {% for p in pipelines %}
+    <div class="pipeline-card">
+        <div class="pipeline-header">
+            <span class="pipeline-date">{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+            <span class="badge badge-{{ p.status }}">{{ p.status }}</span>
+        </div>
+
+        {% if p.editor_output %}
+        <div class="draft-preview">
+            <h3>LinkedIn Post</h3>
+            <p class="preview-text">{{ p.editor_output.linkedin_draft.content[:200] }}...</p>
+        </div>
+        <div class="draft-preview">
+            <h3>Medium Article</h3>
+            <p class="preview-text">{{ p.editor_output.medium_draft.title }}</p>
+        </div>
+        {% endif %}
+
+        {% if p.scout_output %}
+        <div class="topics">
+            {% for topic in p.scout_output.topics %}
+            <span class="tag">{{ topic }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="pipeline-actions">
+            <a href="/review/{{ p.id }}" class="btn btn-primary">Review</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No pending drafts. The pipeline runs daily at 7am AEST.</p>
+    <p>You can also trigger it manually via the Cloud Function.</p>
+</div>
+{% endif %}
+{% endblock %}

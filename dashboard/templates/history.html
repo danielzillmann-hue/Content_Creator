@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Published History — AI Content Engine{% endblock %}
+{% block content %}
+<h1>Published History</h1>
+
+{% if pipelines %}
+<div class="pipeline-list">
+    {% for p in pipelines %}
+    <div class="pipeline-card">
+        <div class="pipeline-header">
+            <span class="pipeline-date">{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+            <span class="badge badge-published">published</span>
+        </div>
+
+        {% if p.editor_output %}
+        <h3>{{ p.editor_output.medium_draft.title }}</h3>
+        <p class="preview-text">{{ p.editor_output.linkedin_draft.content[:150] }}...</p>
+        {% endif %}
+
+        <div class="publish-results">
+            {% if p.linkedin_result %}
+            <span class="result {% if p.linkedin_result.success %}result-success{% else %}result-fail{% endif %}">
+                LinkedIn: {% if p.linkedin_result.success %}Published{% else %}Failed{% endif %}
+                {% if p.linkedin_result.post_url %}
+                <a href="{{ p.linkedin_result.post_url }}" target="_blank" rel="noopener">View</a>
+                {% endif %}
+            </span>
+            {% endif %}
+
+            {% if p.medium_result %}
+            <span class="result {% if p.medium_result.success %}result-success{% else %}result-fail{% endif %}">
+                Medium: {% if p.medium_result.success %}Published{% else %}Failed{% endif %}
+                {% if p.medium_result.post_url %}
+                <a href="{{ p.medium_result.post_url }}" target="_blank" rel="noopener">View</a>
+                {% endif %}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No published posts yet. Approve drafts from the Drafts page to publish them.</p>
+</div>
+{% endif %}
+{% endblock %}

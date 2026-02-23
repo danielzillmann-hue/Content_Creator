@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Review Draft — AI Content Engine{% endblock %}
+{% block content %}
+<h1>Review Draft</h1>
+<p class="meta">Created: {{ pipeline.created_at.strftime('%Y-%m-%d %H:%M UTC') }} | Status: <span class="badge badge-{{ pipeline.status }}">{{ pipeline.status }}</span></p>
+
+{% if pipeline.scout_output %}
+<section class="section">
+    <h2>Scout Findings</h2>
+    <div class="scout-items">
+        {% for item in pipeline.scout_output.items %}
+        <div class="scout-item">
+            <strong>{{ item.headline }}</strong>
+            <p>{{ item.summary }}</p>
+            {% if item.source_url %}
+            <a href="{{ item.source_url }}" target="_blank" rel="noopener">Source</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if pipeline.editor_output %}
+<form method="post" action="/approve/{{ pipeline.id }}">
+    <section class="section">
+        <h2>LinkedIn Post</h2>
+        <textarea name="linkedin_content" rows="12" class="editor-textarea">{{ pipeline.editor_output.linkedin_draft.content }}</textarea>
+    </section>
+
+    <section class="section">
+        <h2>Medium Article (Markdown)</h2>
+        <textarea name="medium_content" rows="25" class="editor-textarea">{{ pipeline.editor_output.medium_draft.content_markdown }}</textarea>
+        <p class="hint">Title: {{ pipeline.editor_output.medium_draft.title }} | Tags: {{ pipeline.editor_output.medium_draft.tags | join(', ') }}</p>
+    </section>
+
+    <div class="action-bar">
+        <button type="submit" class="btn btn-success">Approve (Save Edits)</button>
+        <button type="submit" formaction="/publish/{{ pipeline.id }}" class="btn btn-primary">Approve &amp; Publish Now</button>
+        <button type="submit" formaction="/reject/{{ pipeline.id }}" class="btn btn-danger">Reject</button>
+        <a href="/" class="btn btn-secondary">Back</a>
+    </div>
+</form>
+{% else %}
+<p class="empty-state">No editor output available for this pipeline.</p>
+{% endif %}
+{% endblock %}

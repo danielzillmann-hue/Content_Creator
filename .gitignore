@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment (local dev only — production uses Secret Manager)
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# GCP
+.gcloud_token
+*.json.key
+
+# Test/cache
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Claude Code
+.claude/

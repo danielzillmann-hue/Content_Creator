@@ -1,0 +1,15 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+.env
+.env.local
+.pytest_cache/
+.claude/
+tests/
+docs/
+*.md
+!requirements.txt
+dashboard.log

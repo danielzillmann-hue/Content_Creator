@@ -1,0 +1,32 @@
+# AI Content Engine - Dependencies
+
+# Vertex AI (new google-genai SDK)
+google-genai>=1.0.0
+google-auth>=2.0.0
+
+# GCP Services
+google-cloud-bigquery>=3.0.0
+google-cloud-secret-manager>=2.0.0
+
+# Web framework (Dashboard)
+fastapi>=0.100.0
+uvicorn[standard]>=0.20.0
+jinja2>=3.0.0
+python-multipart>=0.0.5
+itsdangerous>=2.0.0
+
+# Cloud Functions
+functions-framework>=3.0.0
+
+# HTTP client (LinkedIn/Medium API calls)
+httpx>=0.24.0
+
+# Content processing
+markdown>=3.4.0
+
+# Data validation
+pydantic>=2.0.0
+
+# Dev/test
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
