@@ -1,0 +1,35 @@
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t', 'australia-southeast1-docker.pkg.dev/$PROJECT_ID/content-engine-repo/content-engine-dashboard:$COMMIT_SHA',
+      '-t', 'australia-southeast1-docker.pkg.dev/$PROJECT_ID/content-engine-repo/content-engine-dashboard:latest',
+      '.'
+    ]
+
+  # Push the image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '--all-tags', 'australia-southeast1-docker.pkg.dev/$PROJECT_ID/content-engine-repo/content-engine-dashboard']
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [
+      'run', 'deploy', 'content-engine-dashboard',
+      '--image', 'australia-southeast1-docker.pkg.dev/$PROJECT_ID/content-engine-repo/content-engine-dashboard:$COMMIT_SHA',
+      '--region', 'australia-southeast1',
+      '--platform', 'managed',
+      '--allow-unauthenticated',
+      '--service-account', 'content-engine-sa@$PROJECT_ID.iam.gserviceaccount.com',
+      '--set-env-vars', 'GCP_PROJECT=$PROJECT_ID,GCP_REGION=us-central1',
+      '--memory', '512Mi',
+      '--timeout', '300'
+    ]
+
+images:
+  - 'australia-southeast1-docker.pkg.dev/$PROJECT_ID/content-engine-repo/content-engine-dashboard:$COMMIT_SHA'
+  - 'australia-southeast1-docker.pkg.dev/$PROJECT_ID/content-engine-repo/content-engine-dashboard:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
