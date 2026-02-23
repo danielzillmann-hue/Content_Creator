@@ -124,6 +124,8 @@ h3 { margin-bottom: 0.5rem; font-size: 1.1rem; }
 .btn-danger { background: var(--danger); color: white; }
 .btn-secondary { background: var(--border); color: var(--text); }
 .btn-link { color: var(--primary); background: none; padding: 0; }
+.btn-linkedin { background: #0a66c2; color: white; }
+.btn-medium { background: #242424; color: white; }
 
 .pipeline-actions { margin-top: 1rem; }
 

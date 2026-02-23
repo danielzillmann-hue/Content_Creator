@@ -101,14 +101,30 @@ async def reject(request: Request, pipeline_id: str):
 
 
 @app.post("/publish/{pipeline_id}")
-async def publish(request: Request, pipeline_id: str):
-    """Approve and immediately publish to LinkedIn + Medium."""
+async def publish(
+    request: Request,
+    pipeline_id: str,
+    platform: str = Form("all"),
+    linkedin_content: str = Form(None),
+    medium_content: str = Form(None),
+):
+    """Approve and publish to LinkedIn, Medium, or both."""
     from agents.publisher import LinkedInPublisher, MediumPublisher
-    from storage.bigquery import get_pipeline, update_pipeline_status
+    from storage.bigquery import (
+        get_pipeline,
+        update_pipeline_content,
+        update_pipeline_status,
+    )
 
     pipeline = get_pipeline(pipeline_id)
     if not pipeline or not pipeline.editor_output:
         raise HTTPException(status_code=404, detail="Pipeline not found")
+
+    # Save any edits before publishing
+    if linkedin_content or medium_content:
+        update_pipeline_content(pipeline_id, linkedin_content, medium_content)
+        # Re-fetch to get updated content
+        pipeline = get_pipeline(pipeline_id)
 
     # Mark as approved
     update_pipeline_status(pipeline_id, "approved", approved_by="dashboard")
@@ -116,27 +132,29 @@ async def publish(request: Request, pipeline_id: str):
     results = {}
 
     # Publish to LinkedIn
-    try:
-        linkedin = LinkedInPublisher()
-        result = await linkedin.publish_post(
-            pipeline.editor_output.linkedin_draft
-        )
-        results["linkedin"] = result.model_dump(mode="json")
-    except Exception as e:
-        logger.error(f"LinkedIn publish failed: {e}")
-        results["linkedin"] = {"success": False, "error": str(e)}
+    if platform in ("all", "linkedin"):
+        try:
+            linkedin = LinkedInPublisher()
+            result = await linkedin.publish_post(
+                pipeline.editor_output.linkedin_draft
+            )
+            results["linkedin"] = result.model_dump(mode="json")
+        except Exception as e:
+            logger.error(f"LinkedIn publish failed: {e}")
+            results["linkedin"] = {"success": False, "error": str(e)}
 
     # Publish to Medium
-    try:
-        medium = MediumPublisher()
-        result = await medium.publish_article(
-            pipeline.editor_output.medium_draft,
-            publish_status="public",
-        )
-        results["medium"] = result.model_dump(mode="json")
-    except Exception as e:
-        logger.error(f"Medium publish failed: {e}")
-        results["medium"] = {"success": False, "error": str(e)}
+    if platform in ("all", "medium"):
+        try:
+            medium = MediumPublisher()
+            result = await medium.publish_article(
+                pipeline.editor_output.medium_draft,
+                publish_status="public",
+            )
+            results["medium"] = result.model_dump(mode="json")
+        except Exception as e:
+            logger.error(f"Medium publish failed: {e}")
+            results["medium"] = {"success": False, "error": str(e)}
 
     update_pipeline_status(pipeline_id, "published", results)
 

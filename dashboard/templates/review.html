@@ -36,7 +36,9 @@
 
     <div class="action-bar">
         <button type="submit" class="btn btn-success">Approve (Save Edits)</button>
-        <button type="submit" formaction="/publish/{{ pipeline.id }}" class="btn btn-primary">Approve &amp; Publish Now</button>
+        <button type="submit" formaction="/publish/{{ pipeline.id }}" name="platform" value="linkedin" class="btn btn-linkedin">Publish LinkedIn</button>
+        <button type="submit" formaction="/publish/{{ pipeline.id }}" name="platform" value="medium" class="btn btn-medium">Publish Medium</button>
+        <button type="submit" formaction="/publish/{{ pipeline.id }}" name="platform" value="all" class="btn btn-primary">Publish Both</button>
         <button type="submit" formaction="/reject/{{ pipeline.id }}" class="btn btn-danger">Reject</button>
         <a href="/" class="btn btn-secondary">Back</a>
     </div>
