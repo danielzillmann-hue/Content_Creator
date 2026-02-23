@@ -18,8 +18,8 @@ class Settings:
     GCP_REGION: str = os.getenv("GCP_REGION", "us-central1")
 
     # Vertex AI models
-    SCOUT_MODEL: str = os.getenv("SCOUT_MODEL", "gemini-2.0-flash")
-    EDITOR_MODEL: str = os.getenv("EDITOR_MODEL", "gemini-2.0-pro")
+    SCOUT_MODEL: str = os.getenv("SCOUT_MODEL", "gemini-2.5-flash")
+    EDITOR_MODEL: str = os.getenv("EDITOR_MODEL", "gemini-2.5-flash")
 
     # BigQuery
     BQ_DATASET: str = os.getenv("BQ_DATASET", "content_engine")
