@@ -27,6 +27,8 @@ class ScoutReport(BaseModel):
     items: list[NewsItem]
     raw_response: str = ""
     grounding_sources: list[dict] = Field(default_factory=list)
+    source_type: str = "automated"  # "automated" or "manual"
+    source_url: str = ""  # Original URL for manual content
 
 
 class LinkedInDraft(BaseModel):

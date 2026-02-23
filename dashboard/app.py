@@ -154,6 +154,88 @@ async def history(request: Request):
     )
 
 
+# --- Manual Content Creation ---
+
+
+@app.get("/create", response_class=HTMLResponse)
+async def create_form(request: Request):
+    """Render the manual content creation form."""
+    return templates.TemplateResponse(
+        "create.html", {"request": request}
+    )
+
+
+@app.post("/create")
+async def create_post(
+    request: Request,
+    input_type: str = Form(...),
+    url: str = Form(""),
+    text: str = Form(""),
+    title: str = Form(""),
+):
+    """Process manual content input → ContentProcessor → Editor → BigQuery."""
+    from datetime import UTC, datetime
+
+    from agents.content_processor import ContentProcessor
+    from agents.editor import EditorAgent
+    from models.schemas import ContentPipeline
+    from storage.bigquery import store_pipeline
+
+    try:
+        processor = ContentProcessor()
+
+        if input_type == "url":
+            if not url.strip():
+                return templates.TemplateResponse(
+                    "create.html",
+                    {"request": request, "error": "Please enter a URL."},
+                )
+            scout_report = processor.process_url(url.strip())
+        else:
+            if not text.strip():
+                return templates.TemplateResponse(
+                    "create.html",
+                    {"request": request, "error": "Please enter some content."},
+                )
+            scout_report = processor.process_text(
+                text.strip(), title=title.strip() or None
+            )
+
+        # Generate drafts using the existing Editor agent
+        editor = EditorAgent()
+        editor_output = editor.write(scout_report)
+
+        # Store in BigQuery for review
+        pipeline = ContentPipeline(
+            id=str(uuid.uuid4()),
+            created_at=datetime.now(UTC),
+            scout_output=scout_report,
+            editor_output=editor_output,
+            status="draft",
+        )
+        store_pipeline(pipeline)
+
+        logger.info(f"Manual pipeline {pipeline.id} created")
+        return RedirectResponse(
+            url=f"/review/{pipeline.id}", status_code=303
+        )
+
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "create.html",
+            {"request": request, "error": str(e)},
+        )
+    except Exception as e:
+        logger.error(f"Manual content creation failed: {e}", exc_info=True)
+        return templates.TemplateResponse(
+            "create.html",
+            {
+                "request": request,
+                "error": "Something went wrong. Please try again.",
+            },
+        )
+
+
 # --- LinkedIn OAuth ---
 
 

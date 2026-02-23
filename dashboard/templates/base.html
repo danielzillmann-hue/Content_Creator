@@ -10,6 +10,7 @@
     <nav>
         <div class="nav-brand">AI Content Engine</div>
         <div class="nav-links">
+            <a href="/create" class="btn btn-primary btn-sm">+ New Post</a>
             <a href="/" class="{% if request.url.path == '/' %}active{% endif %}">Drafts</a>
             <a href="/history" class="{% if request.url.path == '/history' %}active{% endif %}">History</a>
             <a href="/auth/linkedin" class="btn-link">Connect LinkedIn</a>
