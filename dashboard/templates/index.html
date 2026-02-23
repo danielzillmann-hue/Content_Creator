@@ -1,12 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Drafts — AI Content Engine{% endblock %}
 {% block page_title %}Drafts{% endblock %}
-{% block page_actions %}
-<a href="/create" class="btn btn-primary btn-sm">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    New Post
-</a>
-{% endblock %}
 
 {% block content %}
 {% if pipelines %}
@@ -15,7 +9,7 @@
     <a href="/review/{{ p.id }}" class="pipeline-card">
         <div class="pipeline-header">
             <span class="pipeline-date">{{ p.created_at.strftime('%b %d, %Y at %H:%M') }}</span>
-            <div style="display:flex;gap:0.4rem;align-items:center;">
+            <div class="badge-group">
                 {% if p.scout_output and p.scout_output.source_type == 'manual' %}
                 <span class="badge badge-manual">manual</span>
                 {% endif %}
@@ -46,8 +40,8 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     </div>
     <h3>No drafts yet</h3>
-    <p>Create your first post manually, or wait for the daily automated pipeline to generate one.</p>
-    <a href="/create" class="btn btn-primary">Create New Post</a>
+    <p>Create your first post or wait for the daily automated pipeline.</p>
+    <a href="/create" class="btn btn-primary">New Post</a>
 </div>
 {% endif %}
 {% endblock %}
